@@ -39,6 +39,18 @@ class  ApiFeatures{
         return this;
 
     }
+
+    //creating pagination for our products (number of pro per page)
+
+    pagination(resultPerpage){
+        const currentPage =Number(this.queryStr.page) || 1;
+
+        const skip= resultPerpage * (currentPage-1);
+
+        this.query=this.query.limit(resultPerpage).skip(skip);
+
+        return this;
+    }
 };
 
 module.exports=ApiFeatures
