@@ -15,8 +15,10 @@ exports.registerUser=catchasyncErrors(async(req,res,next)=>{
             url:"profilepicture1"
         },
     });
+
+    const token= user.getJWTToken();
     res.status(201).json({
         success:true,
-        user,
+        token,
     })
 })
