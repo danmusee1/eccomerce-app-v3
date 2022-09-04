@@ -7,8 +7,10 @@ app.use(express.json())
 
 //Route imports
 const product= require("./routes/productRoute");
-
+const user= require("./routes/userRoute");
 app.use("/api/v1",product);
+//route import-user
+app.use("/api/v1", user)
 //Midleware for erros
 app.use(errorMiddleware);
 module.exports=app;
