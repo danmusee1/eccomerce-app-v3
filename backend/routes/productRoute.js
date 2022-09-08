@@ -13,6 +13,7 @@ router
 .route("/products/:id")
 .put(isAuthenticatedUser ,authorizeRoles("admin"),updateProduct)
 .delete(isAuthenticatedUser ,authorizeRoles("admin"),deleteProducts)
-.get(getProductDetails)
+
+router.route("/product/:id").get(getProductDetails);
 
 module.exports= router
