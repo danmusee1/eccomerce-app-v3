@@ -3,7 +3,8 @@ const catchasyncErrors= require("../middleware/catchAsyncErrors");
 const User= require("../models/userModel");
 const sendToken = require("../utils/jwtToken");
 const sendEmail= require("../utils/sendEmail")
-const crypto= require("crypto")
+const crypto= require("crypto");
+const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 
 //register a user
 exports.registerUser=catchasyncErrors(async(req,res,next)=>{
@@ -21,30 +22,30 @@ exports.registerUser=catchasyncErrors(async(req,res,next)=>{
     sendToken(user,201,res);
 });
 
-//Login User
+// Login User
+exports.loginUser = catchAsyncErrors(async (req, res, next) => {
+  const { email, password } = req.body;
 
-exports.loginUser=catchasyncErrors(async(req,res,next)=>{
-    const {email,password}=req.body;
-     
-    //cheking is user has given both the password and email
-    if(!email || !password){
-        return next(new ErrorHandler("please enter Email & password",400))
-    }
-    const user= await User.findOne({email}).select("+password");
+  // checking if user has given password and email both
 
-    if(!user){
-        return next(new ErrorHandler("invalid email or password",401));
-    }
+  if (!email || !password) {
+    return next(new ErrorHandler("Please Enter Email & Password", 400));
+  }
 
-    const isPasswordMatched = user.comparePassword(password);
+  const user = await User.findOne({ email }).select("+password");
 
+  if (!user) {
+    return next(new ErrorHandler("Invalid email or password", 401));
+  }
 
-    if(!isPasswordMatched){
-        return next(new ErrorHandler("invalid email or password",401));
-    }
+  const isPasswordMatched = await user.comparePassword(password);
 
-    sendToken(user,200,res);
-})
+  if (!isPasswordMatched) {
+    return next(new ErrorHandler("Invalid email or password", 401));
+  }
+
+  sendToken(user, 200, res);
+});
     
 
 //logout user
@@ -144,3 +145,34 @@ exports.resetPassword = catchasyncErrors(async (req, res, next) => {
     
       sendToken(user, 200, res);
     });
+
+    //Get user Detail
+    exports.getUserDetails = catchAsyncErrors(async(req,res,next)=>{
+      const user= await User.findById(req.user.id);
+
+      res.status(200).json({
+        success:true,
+        user,
+      })
+    })
+
+   // update User password
+exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("+password");
+
+  const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
+
+  if (!isPasswordMatched) {
+    return next(new ErrorHandler("Old password is incorrect", 400));
+  }
+
+  if (req.body.newPassword !== req.body.confirmPassword) {
+    return next(new ErrorHandler("password does not match", 400));
+  }
+
+  user.password = req.body.newPassword;
+
+  await user.save();
+
+  sendToken(user, 200, res);
+});
