@@ -1,5 +1,4 @@
 const ErrorHandler = require("../utils/errorhandler");
-const catchasyncErrors= require("../middleware/catchAsyncErrors");
 const User= require("../models/userModel");
 const sendToken = require("../utils/jwtToken");
 const sendEmail= require("../utils/sendEmail")
@@ -7,7 +6,7 @@ const crypto= require("crypto");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 
 //register a user
-exports.registerUser=catchasyncErrors(async(req,res,next)=>{
+exports.registerUser=catchAsyncErrors(async(req,res,next)=>{
     const {name,email,password}=req.body;
     const user= await User.create({
         name,
@@ -49,7 +48,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     
 
 //logout user
-exports.logout = catchasyncErrors(async (req, res, next) => {
+exports.logout = catchAsyncErrors(async (req, res, next) => {
     res.cookie("token", null, {
       expires: new Date(Date.now()),
       httpOnly: true,
@@ -63,7 +62,7 @@ exports.logout = catchasyncErrors(async (req, res, next) => {
 
   //Forgot Password
 
-  exports.forgotPassword= catchasyncErrors(async(req,res,next)=>{
+  exports.forgotPassword= catchAsyncErrors(async(req,res,next)=>{
     const user= await User.findOne({email:req.body.email});
 
     if(!user){
@@ -112,7 +111,7 @@ exports.logout = catchasyncErrors(async (req, res, next) => {
 
 
 // Reset Password
-exports.resetPassword = catchasyncErrors(async (req, res, next) => {
+exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
     // creating token hash
     const resetPasswordToken = crypto
       .createHash("sha256")
